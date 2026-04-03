@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initRoleTypewriter();
     initScrollAnimations();
     initStatCounters();
+    initAchievementCounters();
     initMobileMenu();
-    initContactForm();
     initEmailCopy();
     initSmoothScrolling();
 });
@@ -150,7 +150,9 @@ function initScrollAnimations() {
         .project-card,
         .timeline-item,
         .contact-info,
-        .contact-form-wrapper
+        .contact-form-wrapper,
+        .stat-item,
+        .achievement-category
     `);
 
     const observerOptions = {
@@ -254,49 +256,51 @@ function initMobileMenu() {
     });
 }
 
-// ===== CONTACT FORM =====
-function initContactForm() {
-    const form = document.querySelector('#contact-form');
-    if (!form) return;
+// ===== ACHIEVEMENT COUNTERS =====
+function initAchievementCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    const speed = 200; // Animation speed
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(form);
-        const data = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            message: formData.get('message')
+    const startCounting = (counter) => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const increment = target / speed;
+        let current = 0;
+
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.ceil(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                // Format the final number
+                if (target >= 1000) {
+                    counter.textContent = (target / 1000).toFixed(0) + 'K+';
+                } else {
+                    counter.textContent = target + '+';
+                }
+            }
         };
 
-        // Simple validation
-        if (!data.name || !data.email || !data.message) {
-            showToast('Please fill in all fields', 'error');
-            return;
-        }
+        updateCounter();
+    };
 
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(data.email)) {
-            showToast('Please enter a valid email address', 'error');
-            return;
-        }
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
 
-        // Simulate form submission
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-        
-        submitButton.textContent = 'Sending...';
-        submitButton.disabled = true;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                startCounting(counter);
+                observer.unobserve(counter);
+            }
+        });
+    }, observerOptions);
 
-        // Simulate API call
-        setTimeout(() => {
-            showToast('Message sent successfully! I\'ll get back to you soon.', 'success');
-            form.reset();
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-        }, 1500);
+    counters.forEach(counter => {
+        observer.observe(counter);
     });
 }
 
