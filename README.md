@@ -1,8 +1,7 @@
-# Sneha Kalra - Full Stack Portfolio 🚀
+# Sneha Kalra - Full Stack Portfolio 
 
 Welcome to my personal portfolio repository! This is a modern, responsive, and high-performance web application designed to showcase my journey as a Full Stack Developer, my technical skills, and the projects I've built.
 
-![Portfolio Preview](assets/profilemicro.jpg)
 
 ## 👤 About Me
 
